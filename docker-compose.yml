@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+  db:
+    image: percona
+    volumes:
+      - /data/warroom/db:/var/lib/mysql
+    env_file:
+      - .env
+  web:
+    image: srvaudit/warroom-web:rel-0.2
+    volumes:
+      - /data/warroom/www:/var/www/warroom
+      - /data/warroom/ssl:/etc/nginx/ssl
+    ports:
+      - mode: host
+        target: 443
+        published: 443
+        protocol: tcp
+      - mode: host
+        target: 80
+        published: 80
+        protocol: tcp
+    env_file:
+      - .env
+  php:
+    image: srvaudit/warroom-php:rel-0.2
+    volumes:
+      - /data/warroom/www:/var/www/warroom
+      - /data/log/warroom.log:/usr/src/warroom/storage/logs/laravel.log
+    env_file:
+      - .env
+  redis:
+    image: redis
+  echo:
+    image: srvaudit/warroom-echo:release-0.1
+    volumes:
+      - /data/warroom/ssl:/ssl
+    ports:
+      - mode: host
+        target: 6001
+        published: 333
+        protocol: tcp
+
